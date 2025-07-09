@@ -1,7 +1,13 @@
 <?php
+namespace App\Config;
+
+use Dotenv\Dotenv;
 
 class Config
 {
+    /**Class Config manuelle, cette classe sert à cherger le fichier .env, à le lire et séparer et nettoyer les données
+     * si on n'utilise pas de framework comme Symfony ou Laravel
+    
     private static array $config = [];
     private static bool $loaded  = false;
 
@@ -54,5 +60,29 @@ class Config
     public static function isDebug(): bool
     {
         return self::get('APP_DEBUG', 'false') === 'true';
+    }*/
+
+    /**
+     * @param string $path le chemin vers le dossier contenant le fichier .env
+     */
+
+    public static function load($path = __DIR__ . '../'): void
+    {
+        //On vérifie si le fichier .env existe avant de tenter de le charger
+        if (file_exists($path . '.env')) {
+            $dotenv = Dotenv::createImmutable($path);
+            $dotenv->load();
+        }
     }
+    /**
+     * @param string $key le nom de la variable d'environnement
+     * @param mixed $default la valeur par défaut si la variable n'est pas définie
+     * @return mixed la valeur de la variable d'environnement ou la valeur par défaut
+     */
+
+    public static function get(string $key, $default = null)
+    {
+        return $_ENV[$key] ?? $default;
+    }
+
 }
