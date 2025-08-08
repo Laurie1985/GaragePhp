@@ -1,7 +1,7 @@
 <?php
 namespace App\Models;
 
-/*use InvalidArgumentException;*/
+use InvalidArgumentException;
 use PDO;
 
 class User extends BaseModel
@@ -34,18 +34,37 @@ class User extends BaseModel
     //Setters avec validation
     public function setUsername(string $username): self
     {
+        if (empty(trim($username)) || strlen($username) > 50) {
+            throw new InvalidArgumentException("Le nom d'utilisateur est invalide");
+        }
+        $this->username = trim($username);
         return $this;
     }
+
     public function setEmail(string $email): self
     {
+        if (! filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            throw new InvalidArgumentException("L'email est invalide");
+        }
+        $this->email = trim(strtolower($email));
         return $this;
     }
+
     public function setPassword(string $password): self
     {
+        if (strlen($password) < 9) {
+            throw new InvalidArgumentException("Le mot de passe doit contenir au moins 9 caractères");
+        }
+        $this->password = password_hash($password, PASSWORD_ARGON2ID); // Hachage du mot de passe
         return $this;
     }
+
     public function setRole(string $role): self
     {
+        if (! in_array($role, ['user', 'admin'])) {
+            throw new InvalidArgumentException("Le rôle est invalide.");
+        }
+        $this->role = $role;
         return $this;
     }
 
